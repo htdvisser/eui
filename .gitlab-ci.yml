@@ -23,6 +23,7 @@ before_script:
 
 stages:
 - test
+- build
 
 test:
   stage: test
@@ -31,3 +32,14 @@ test:
   - go vet ./...
   - go test -cover -race -coverprofile=coverage.txt -covermode=atomic ./...
   - bash <(curl -s https://codecov.io/bash)
+
+build:
+  stage: build
+  artifacts:
+    paths:
+    - dist
+  script:
+  - if [[ ! -d dist ]]; then mkdir dist; fi
+  - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -gcflags="all=-trimpath=$GOPATH" -asmflags="all=-trimpath=$GOPATH" -ldflags "-s -w" -o dist/whois-eui-linux-amd64 ./cmd/whois-eui/main.go
+  - CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -gcflags="all=-trimpath=$GOPATH" -asmflags="all=-trimpath=$GOPATH" -ldflags "-s -w" -o dist/whois-eui-darwin-amd64 ./cmd/whois-eui/main.go
+  - CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -gcflags="all=-trimpath=$GOPATH" -asmflags="all=-trimpath=$GOPATH" -ldflags "-s -w" -o dist/whois-eui-windows-amd64.exe ./cmd/whois-eui/main.go

@@ -1,9 +1,8 @@
-image: golang:1.10
+image: golang:1.11rc2
 
 cache:
   paths:
-  - .go/src/v
-  - .go/tmp
+  - .go/pkg/mod
 
 before_script:
 - export GOPATH=$(realpath .)/.go
@@ -11,7 +10,6 @@ before_script:
 - export PATH="$PATH:$GOPATH/bin"
 - export GOTMPDIR=$GOPATH/tmp
 - if [[ ! -d $GOTMPDIR ]]; then mkdir -p $GOTMPDIR; fi
-- make dev-deps
 
 stages:
 - test
@@ -20,9 +18,8 @@ stages:
 test:
   stage: test
   script:
-  - vgo test -cover -race -coverprofile=coverage.txt -covermode=atomic ./...
-  - vgo fmt ./...
-  - vgo vet ./...
+  - go test -cover -race -coverprofile=coverage.txt -covermode=atomic ./...
+  - go fmt ./...
 
 build:
   stage: build

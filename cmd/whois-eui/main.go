@@ -31,11 +31,14 @@ func main() {
 
 	dbLocation := *database
 	if dbLocation == defaultDatabase {
-		tmpDir := os.Getenv("TMPDIR")
-		if tmpDir == "" {
-			tmpDir = "/tmp"
+		cacheDir, err := os.UserCacheDir()
+		if err != nil {
+			cacheDir = os.Getenv("TMPDIR")
+			if cacheDir == "" {
+				cacheDir = "/tmp"
+			}
 		}
-		dbLocation = filepath.Join(tmpDir, "eui-registrations.db")
+		dbLocation = filepath.Join(cacheDir, "eui-registrations.db")
 	}
 
 	db, err := bolt.Open(dbLocation, 0600, nil)
